@@ -87,5 +87,43 @@ def fill_missing_values(df, output_path):
     df.to_csv(output_path, index=False)
 
 
+def downsample_to_frequency(df, target_hz, timestamp_col='NTP', output_path=None, categorical_attributes=None):
+    """
+    Downsamples the DataFrame to the specified frequency (Hz).
+    For categorical attributes, takes the majority value in each interval.
+    For numeric attributes, takes the mean.
+
+    Parameters:
+        df (pd.DataFrame): DataFrame with timestamp column.
+        target_hz (int): Target frequency in Hz (e.g., 100 for 100Hz).
+        timestamp_col (str): Name of the timestamp column.
+        output_path (str): Path to save the downsampled CSV.
+        categorical_attributes (list): List of categorical attribute names.
+
+    Returns:
+        pd.DataFrame: Downsampled DataFrame at the target frequency.
+    """
+    import numpy as np
+
+    df[timestamp_col] = pd.to_datetime(df[timestamp_col])
+    df = df.set_index(timestamp_col)
+    interval_ms = int(1000 / target_hz)
+
+    # Separate columns
+    if categorical_attributes is None:
+        categorical_attributes = []
+    numeric_cols = [col for col in df.columns if col not in categorical_attributes]
+    agg_dict = {col: 'mean' for col in numeric_cols}
+    for cat in categorical_attributes:
+        agg_dict[cat] = lambda x: x.mode().iloc[0] if not x.mode().empty else (x.iloc[0] if len(x) > 0 else np.nan)
+
+    df_downsampled = df.resample(f'{interval_ms}ms').agg(agg_dict)
+    # Interpolate only numeric columns
+    df_downsampled[numeric_cols] = df_downsampled[numeric_cols].interpolate()
+    df_downsampled = df_downsampled.reset_index()
+    df_downsampled.to_csv(output_path, index=False)
+    return df_downsampled
+
+
 
 
