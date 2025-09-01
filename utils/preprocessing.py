@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.dates as mdates
 
-def combine_activities(df_one, df_two, output_path):
+def combine_activities_curb(df_one, df_two, output_path):
     """
     Combines and processes specific curb crossing activities from two dataframes.
     
@@ -42,7 +42,7 @@ def combine_activities(df_one, df_two, output_path):
     return df_combined
 
 
-def fill_missing_values(df, output_path):
+def fill_missing_values_curb(df, output_path):
     """
     Fill missing values in Acc-X,Y, Z column using temporal interpolation strategy.
     
