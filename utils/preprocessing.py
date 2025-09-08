@@ -1,5 +1,6 @@
 import pandas as pd  
 import numpy as np
+import random
 import matplotlib.dates as mdates
 
 def combine_activities_curb(df_one, df_two, output_path):
@@ -116,9 +117,9 @@ def downsample_to_frequency(df, target_hz, timestamp_col='NTP', output_path=None
     agg_dict = {col: 'mean' for col in numeric_cols}
     for cat in categorical_attributes:
         agg_dict[cat] = lambda x: x.mode().iloc[0] if not x.mode().empty else (x.iloc[0] if len(x) > 0 else np.nan)
-
+    # Downsample the DataFrame by grouping data into intervals of 'interval_ms' milliseconds, then aggregate each column in these intervals using the functions specified in agg_dict
     df_downsampled = df.resample(f'{interval_ms}ms').agg(agg_dict)
-    # Interpolate only numeric columns
+    # Fills in missing values (NaNs) in the numeric columns of the downsampled DataFrame by interpolation
     df_downsampled[numeric_cols] = df_downsampled[numeric_cols].interpolate()
     df_downsampled = df_downsampled.reset_index()
     df_downsampled.to_csv(output_path, index=False)
