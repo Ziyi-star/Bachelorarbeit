@@ -3,6 +3,8 @@ import numpy as np
 import random
 import matplotlib.dates as mdates
 
+from utils.visualization import plot_accelerometer_data
+
 def combine_activities_curb(df_one, df_two, output_path):
     """
     Combines and processes specific curb crossing activities from two dataframes.
@@ -125,6 +127,78 @@ def downsample_to_frequency(df, target_hz, timestamp_col='NTP', output_path=None
     df_downsampled.to_csv(output_path, index=False)
     return df_downsampled
 
+def trim_by_std(df, threshold=0.5, window_size=100):
+    """
+    Automatically trims the initial quiet period in accelerometer data where no significant movement occurs.
+    
+    Args:
+        df: DataFrame with accelerometer data
+        threshold: Standard deviation threshold to detect activity
+        window_size: Size of the rolling window for standard deviation calculation
+        
+    Returns:
+        Trimmed DataFrame starting from where activity begins
+    """
 
+    # Calculate rolling standard deviation for all axes
+    # Computes the standard deviation within each window = window_size
+    roll_std_x = df['Acc-X'].rolling(window=window_size).std()
+    roll_std_y = df['Acc-Y'].rolling(window=window_size).std()
+    roll_std_z = df['Acc-Z'].rolling(window=window_size).std()
+    
+    # Combine all axes to detect activity in any direction
+    combined_std = roll_std_x + roll_std_y + roll_std_z
+    
+    # Find the first point where the combined standard deviation exceeds the threshold
+    # (We use a buffer of window_size to ensure we have enough data before the activity starts)
+    activity_starts = combined_std[window_size:].gt(threshold).idxmax()
+    
+    # If no activity is detected, return the original dataframe
+    if activity_starts == 0:
+        print("No significant activity detected in the dataset.")
+        return df
+    
+    # Trim the dataframe to start from the detected activity start point
+    # We can optionally include a small buffer before the activity starts
+    buffer = int(window_size/2)  # Half window size as buffer
+    start_idx = max(0, activity_starts - buffer)
+    #start_idx = max(0, activity_starts)
+    
+    trimmed_df = df.iloc[start_idx:].copy()
+    
+    # Print info about the trimming
+    start_time = df.iloc[activity_starts]['NTP']
+    original_len = len(df)
+    trimmed_len = len(trimmed_df)
+    removed_percentage = ((original_len - trimmed_len) / original_len) * 100
+    
+    print(f"Activity detected starting at index {activity_starts}")
+    print(f"Trimmed {original_len - trimmed_len} datapoints ({removed_percentage:.1f}% of the dataset)")
+    print(f"Activity start time (NTP): {start_time}")
+    
+    return trimmed_df
+
+def trim_by_start_time(df, start_time, time_column='NTP'):
+    """
+    Trim DataFrame to only include data after a specific start time.
+    
+    Args:
+        df: DataFrame containing the data
+        start_time: Start time as string (format: "YYYY-MM-DD HH:MM:SS")
+        time_column: Name of the time column (default: 'NTP')
+    
+    Returns:
+        Filtered DataFrame
+    """
+    # Convert time column to datetime
+    df[time_column] = pd.to_datetime(df[time_column])
+    
+    # Convert start time to datetime
+    start = pd.to_datetime(start_time)
+    
+    # Filter data
+    filtered_df = df[df[time_column] >= start].copy()
+    
+    return filtered_df
 
 
