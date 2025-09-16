@@ -201,4 +201,32 @@ def trim_by_start_time(df, start_time, time_column='NTP'):
     
     return filtered_df
 
+def trim_by_time(df, start_time, end_time,time_column='NTP'):
+    """
+    Trim DataFrame to only include data after a specific start time.
+    
+    Args:
+        df: DataFrame containing the data
+        start_time: Start time as string (format: "YYYY-MM-DD HH:MM:SS")
+        time_column: Name of the time column (default: 'NTP')
+    
+    Returns:
+        Filtered DataFrame
+    """
+    # Convert time column to datetime
+    df[time_column] = pd.to_datetime(df[time_column])
+    
+    # Convert start time to datetime
+    start = pd.to_datetime(start_time)
+    end = pd.to_datetime(end_time)
+    
+    # Filter data - do both conditions in one operation for better performance
+    mask = (df[time_column] >= start) & (df[time_column] <= end)
+    filtered_df = df.loc[mask].copy()
+
+    return filtered_df
+
+
+
+
 
