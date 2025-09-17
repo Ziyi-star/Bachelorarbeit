@@ -57,11 +57,12 @@ def preprocess_and_segment_road(esp_path,freq_list, window_sizes, overlap, chann
         # Calculate window size in seconds for better naming
         seconds = win_size / freq
         
-        # Extract directory for proper path construction
+        # Extract directory and base filename
         directory = os.path.dirname(esp_path)
-        
-        # Create the segments filename with proper format
-        segment_filename = f'segments_{freq}hz_{seconds}s_{overlap}overlap.npz'
+        base_filename = os.path.splitext(os.path.basename(esp_path))[0]
+                
+        # Create the segments filename with proper format, including the original filename
+        segment_filename = f'{base_filename}_segments_{freq}hz_{seconds}s_{overlap}overlap.npz'
         segment_path = os.path.join(directory, segment_filename)
         
         # Save the segmented data as a .npz file
