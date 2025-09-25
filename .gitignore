@@ -8,6 +8,7 @@
 
 # Data directory
 data/
+Notebooks/training/keras_tuner/
 
 # Jupyter Notebook
 .ipynb_checkpoints
