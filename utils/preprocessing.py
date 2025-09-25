@@ -235,6 +235,33 @@ def trim_by_time(df, start_time, end_time=None, time_column='NTP'):
     return filtered_df
 
 
+def select_random_samples(data, num_samples):
+    """
+    Randomly selects a specified number of samples from the input data.
+    
+    Parameters:
+    -----------
+    data : numpy.ndarray
+        Input data array from which to select samples. The first dimension is assumed to be the sample dimension.
+    num_samples : int
+        Number of samples to select. Should be less than or equal to the number of samples in data.
+        
+    Returns:
+    --------
+    selected_data : numpy.ndarray
+        Randomly selected samples from the input data. Has the same shape as input data except for
+        the first dimension, which will be equal to num_samples.
+    """
+    
+    # Generate random indices without replacement
+    indices = np.random.choice(data.shape[0], size=num_samples, replace=False)
+    
+    # Select the samples using the random indices
+    selected_data = data[indices]
+    
+    return selected_data
+
+
 
 
 
