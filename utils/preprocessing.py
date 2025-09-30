@@ -2,8 +2,9 @@ import pandas as pd
 import numpy as np
 import random
 import matplotlib.dates as mdates
-
+from sklearn.preprocessing import StandardScaler
 from utils.visualization import plot_accelerometer_data
+
 
 def combine_activities_curb(df_one, df_two, output_path):
     """
@@ -260,6 +261,43 @@ def select_random_samples(data, num_samples):
     selected_data = data[indices]
     
     return selected_data
+
+def normalize_3d_data(data):
+    """
+    Normalize 3D sensor data (samples, timesteps, features) using StandardScaler.
+
+    Parameters:
+    -----------
+    data : list or numpy.ndarray
+        Input data. If a list of arrays, it will be stacked first.
+        Shape should be (N, L, C) where:
+        N = number of samples, L = segment length (timesteps), C = number of channels/features
+
+    Returns:
+    --------
+    numpy.ndarray
+        Normalized data with the same shape as input
+    """
+    # Stack data if it's a list
+    if isinstance(data, list):
+        data_array = np.stack(data)  # shape: (N, L, C)
+    else:
+        data_array = data
+
+    # Get dimensions
+    N, L, C = data_array.shape
+
+    # Reshape to 2D for scaling: (N*L, C)
+    data_reshaped = data_array.reshape(-1, C)
+
+    # Apply standard scaling
+    scaler = StandardScaler()
+    data_scaled = scaler.fit_transform(data_reshaped)
+
+    # Reshape back to original 3D shape
+    data_normalized = data_scaled.reshape(N, L, C)
+
+    return data_normalized
 
 
 
