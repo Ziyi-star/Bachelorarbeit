@@ -73,6 +73,60 @@ def create_base_model(input_shape, model_name="base_model"):
 
     return tf.keras.Model(inputs, x, name=model_name)
 
+def create_base_model_small_dimensions(input_shape, model_name="base_model"):
+    """
+    Create the base model for activity recognition
+    Reference (TPN model):
+        Saeed, A., Ozcelebi, T., & Lukkien, J. (2019). Multi-task self-supervised learning for human activity detection. Proceedings of the ACM on Interactive, Mobile, Wearable and Ubiquitous Technologies, 3(2), 1-30.
+
+    Architecture:
+        Input
+        -> Conv 1D: 32 filters, 24 kernel_size, relu, L2 regularizer, same padding
+        -> Dropout: 10%
+        -> Conv 1D: 64 filters, 16 kernel_size, relu, L2 regularizer, same padding
+        -> Dropout: 10%
+        -> Conv 1D: 96 filters, 8 kernel_size, relu, L2 regularizer, same padding
+        -> Dropout: 10%
+        -> Global Maximum Pooling 1D
+    
+    Parameters:
+        input_shape
+            the input shape for the model, should be (window_size, num_channels)
+    
+    Returns:
+        model (tf.keras.Model)
+    """
+
+    inputs = tf.keras.Input(shape=input_shape, name='input')
+    x = inputs
+    x = tf.keras.layers.Conv1D(
+            32, 24,
+            padding='same',  # Added padding='same'
+            activation='relu',
+            kernel_regularizer=tf.keras.regularizers.l2(1e-4)
+        )(x)
+    x = tf.keras.layers.Dropout(0.1)(x)
+
+    x = tf.keras.layers.Conv1D(
+            64, 16,
+            padding='same',  # Added padding='same'
+            activation='relu',
+            kernel_regularizer=tf.keras.regularizers.l2(1e-4),
+        )(x)
+    x = tf.keras.layers.Dropout(0.1)(x)
+    
+    x = tf.keras.layers.Conv1D(
+        96, 8,
+        padding='same',  # Added padding='same'
+        activation='relu',
+        kernel_regularizer=tf.keras.regularizers.l2(1e-4),
+        )(x)
+    x = tf.keras.layers.Dropout(0.1)(x)
+    
+    x = tf.keras.layers.GlobalMaxPool1D(data_format='channels_last', name='global_max_pooling1d')(x)
+
+    return tf.keras.Model(inputs, x, name=model_name)
+
 def attach_simclr_head(base_model, hidden_1=256, hidden_2=128, hidden_3=50):
     """
     Attach a 3-layer fully-connected encoding head
