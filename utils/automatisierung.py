@@ -8,6 +8,7 @@ from utils.preprocessing import *
 from utils.segmentation import *
 
 def preprocess_and_segment_curb(esp1_path, esp2_path, combined_output_path,freq_list, window_sizes, overlap, channels, scene_col='curb_scene'):
+    ## For curb
     # 1. Handle missing values for ESP1
     df_one = pd.read_csv(esp1_path)
     output1 = esp1_path.replace('.csv', '_filled_missing_values.csv')
@@ -38,6 +39,7 @@ def preprocess_and_segment_curb(esp1_path, esp2_path, combined_output_path,freq_
 
 
 def preprocess_and_segment_road(esp_path,freq_list, window_sizes, overlap, channels):
+    ## for all road surfaces
     # 1. Handle missing values for ESP1
     df_one = pd.read_csv(esp_path)
 

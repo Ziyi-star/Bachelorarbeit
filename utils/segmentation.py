@@ -33,3 +33,4 @@ def segment_acceleration_data_overlapping_numpy(df,window_size=100, overlap=50, 
     # Convert list of arrays to a single 3D numpy array if all segments have the same shape
     segments_array = np.array(segments)  # shape: (num_segments, window_size, 3)
     return segments_array
+
