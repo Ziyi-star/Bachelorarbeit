@@ -58,7 +58,6 @@ def plot_accelerometer_data_bachelorarbeit(df, name):
     df['NTP'] = pd.to_datetime(df['NTP'])
     df.set_index('NTP', inplace=True)
     plt.figure(figsize=(14, 7), dpi=300)
-    plt.title(name)
     plt.plot(df.index, df['Acc-X'], label='Acc-X', zorder=3)
     plt.plot(df.index, df['Acc-Y'], label='Acc-Y', zorder=2)
     plt.plot(df.index, df['Acc-Z'], label='Acc-Z', zorder=1)
@@ -67,9 +66,9 @@ def plot_accelerometer_data_bachelorarbeit(df, name):
     # Rotate date labels
     plt.gcf().autofmt_xdate()
     plt.xticks(rotation=45)
-    # Get the current axes and set major ticks every 120 seconds
+    # Get the current axes and set major ticks every 200 seconds
     ax = plt.gca()
-    ax.xaxis.set_major_locator(mdates.SecondLocator(interval=120))
+    ax.xaxis.set_major_locator(mdates.SecondLocator(interval=200))
     plt.xlabel('Time')
     plt.ylabel('Acceleration (m/s^2)')
     plt.show()
