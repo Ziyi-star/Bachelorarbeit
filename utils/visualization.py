@@ -47,7 +47,7 @@ def plot_accelerometer_data(df, name):
     fig.show()
 
 
-def plot_accelerometer_data_bachelorarbeit(df, name):
+def plot_accelerometer_data_bachelorarbeit(df):
     """
     Plot Acc-X, Acc-Y, and Acc-Z for handlebar accelerometer data over time.
     Parameters

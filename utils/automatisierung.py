@@ -8,7 +8,44 @@ from utils.preprocessing import *
 from utils.segmentation import *
 
 def preprocess_and_segment_curb(esp1_path, esp2_path, combined_output_path,freq_list, window_sizes, overlap, channels, scene_col='curb_scene'):
-    ## For curb
+    """
+    Preprocesses and segments accelerometer data from two ESP devices for curb detection.
+    
+    This function performs several steps:
+    1. Handles missing values in data from both ESP devices
+    2. Combines the data from both devices
+    3. Downsamples the combined data to specified frequencies
+    4. Segments the data into windows for each scene type (curb vs non-curb)
+    
+    Parameters:
+    -----------
+    esp1_path : str
+        Path to the CSV file containing data from first ESP device
+    esp2_path : str
+        Path to the CSV file containing data from second ESP device
+    combined_output_path : str
+        Path where the combined data will be saved
+    freq_list : list
+        List of target frequencies for downsampling (e.g., [100, 30])
+    window_sizes : list
+        List of window sizes for segmentation, matching freq_list
+    overlap : float
+        Overlap ratio between consecutive windows (e.g., 0.5 for 50% overlap)
+    channels : list
+        List of accelerometer channels to process
+    scene_col : str, optional
+        Name of the column indicating scene type (default: 'curb_scene')
+    
+    Returns:
+    --------
+    None
+        Saves processed files to disk:
+        - Filled missing values: *_filled_missing_values.csv
+        - Combined data: specified by combined_output_path
+        - Downsampled data: *_<freq>hz.csv
+        - Segmented data: *_scene<0/1>_segments.npz
+    """
+     
     # 1. Handle missing values for ESP1
     df_one = pd.read_csv(esp1_path)
     output1 = esp1_path.replace('.csv', '_filled_missing_values.csv')
@@ -39,6 +76,35 @@ def preprocess_and_segment_curb(esp1_path, esp2_path, combined_output_path,freq_
 
 
 def preprocess_and_segment_road(esp_path,freq_list, window_sizes, overlap, channels):
+    """
+    Preprocesses and segments accelerometer data from road surface measurements.
+    
+    This function performs several steps:
+    1. Loads and preprocesses accelerometer data from CSV file
+    2. Downsamples data to specified frequencies
+    3. Creates overlapping segments for each frequency
+    4. Saves processed data in various formats
+    
+    Parameters:
+    -----------
+    esp_path : str
+        Path to the CSV file containing accelerometer data
+    freq_list : list
+        List of target frequencies for downsampling (e.g., [100, 30])
+    window_sizes : list
+        List of window sizes for segmentation, matching freq_list
+    overlap : float
+        Overlap ratio between consecutive windows (e.g., 0.5 for 50% overlap)
+    channels : list
+        List of accelerometer channels to process (e.g., ['Acc-X', 'Acc-Y', 'Acc-Z'])
+    
+    Returns:
+    --------
+    None
+        Saves processed files to disk:
+        - Downsampled data: *_<freq>hz.csv
+        - Segmented data: *_segments_<freq>hz_<window>s_<overlap>overlap.npz
+    """
     ## for all road surfaces
     # 1. Handle missing values for ESP1
     df_one = pd.read_csv(esp_path)
@@ -50,12 +116,13 @@ def preprocess_and_segment_road(esp_path,freq_list, window_sizes, overlap, chann
 
     # 2. For each frequency and window size combination
     for freq, win_size in zip(freq_list, window_sizes):
-        # 4a. Downsample the combined dataframe to the target frequency
+        # 2. Downsample the combined dataframe to the target frequency
         downsampled_path = esp_path.replace('.csv', f'_{freq}hz.csv')
         df_down = downsample_to_frequency(df_selected, target_hz=freq, timestamp_col='NTP',output_path=downsampled_path, categorical_attributes=None)
-        # Segment the data into overlapping windows
+        # 3.Segment the data into overlapping windows
         segments = segment_acceleration_data_overlapping_numpy(df_down, window_size=win_size, overlap=overlap, channels=channels)
 
+        # 4. Save the segmented data as a .npz file
         # Calculate window size in seconds for better naming
         seconds = win_size / freq
         
@@ -69,3 +136,5 @@ def preprocess_and_segment_road(esp_path,freq_list, window_sizes, overlap, chann
         
         # Save the segmented data as a .npz file
         np.savez(segment_path, segments=segments)
+
+
