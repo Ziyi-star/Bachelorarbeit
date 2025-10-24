@@ -72,3 +72,23 @@ def plot_accelerometer_data_bachelorarbeit(df):
     plt.xlabel('Time')
     plt.ylabel('Acceleration (m/s^2)')
     plt.show()
+
+# Create a figure with 3 subplots (one for each axis)
+def plot_sample_data_numpy_bachelorarbeit(sample_data, title="Acceleration Data"):
+    plt.figure(figsize=(14, 7), dpi=300)
+    
+    # Get number of time steps
+    time_steps = np.arange(len(sample_data))
+    
+    # Plot X, Y, Z acceleration
+    plt.plot(time_steps, sample_data[:, 0], label='X-axis')
+    plt.plot(time_steps, sample_data[:, 1], label='Y-axis')
+    plt.plot(time_steps, sample_data[:, 2], label='Z-axis')
+    
+    plt.title(title)
+    plt.xlabel('Time Steps')
+    plt.ylabel('Acceleration')
+    plt.legend()
+    plt.grid(True)
+    plt.tight_layout()
+    plt.show()
