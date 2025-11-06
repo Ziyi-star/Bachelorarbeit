@@ -90,7 +90,6 @@ def fill_missing_values_curb(df, output_path):
     # Save processed DataFrame to CSV
     df.to_csv(output_path, index=False)
 
-
 def downsample_to_frequency(df, target_hz, timestamp_col='NTP', output_path=None, categorical_attributes=None):
     """
     Downsamples the DataFrame to the specified frequency (Hz).
