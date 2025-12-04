@@ -34,3 +34,44 @@ def segment_acceleration_data_overlapping_numpy(df,window_size=100, overlap=50, 
     segments_array = np.array(segments)  # shape: (num_segments, window_size, 3)
     return segments_array
 
+def segment_acceleration_data_overlapping_numpy_with_curb_activity(
+    df, window_size=100, overlap=50, channels=['Acc-X', 'Acc-Y', 'Acc-Z'], label_col='curb_activity'
+):
+    """
+    Segments acceleration data into overlapping windows and returns a list of 2D numpy arrays and majority labels.
+
+    Parameters:
+    -----------
+    df : pandas.DataFrame
+        Input DataFrame containing timestamp, acceleration channels, and label column.
+    window_size : int
+        Number of samples per segment.
+    overlap : int
+        Percentage overlap (0-99).
+    channels : list
+        List of column names for the channels (default: ['Acc-X', 'Acc-Y', 'Acc-Z']).
+    label_col : str
+        Name of the label column for majority voting (default: 'curb_activity').
+
+    Returns:
+    --------
+    segments_array : np.ndarray
+        3D numpy array of shape (num_segments, window_size, len(channels)).
+    majority_labels : np.ndarray
+        1D numpy array of majority labels for each segment.
+    """
+    step = int(window_size * (1 - overlap / 100))
+    segments = []
+    majority_labels = []
+    df_sorted = df.sort_values(by='NTP')
+    for start in range(0, len(df_sorted) - window_size + 1, step):
+        end = start + window_size
+        segment = df_sorted.iloc[start:end][channels].values
+        label_segment = df_sorted.iloc[start:end][label_col]
+        majority_label = label_segment.mode().iloc[0] if not label_segment.mode().empty else label_segment.iloc[0]
+        segments.append(segment)
+        majority_labels.append(majority_label)
+    segments_array = np.array(segments)
+    majority_labels = np.array(majority_labels)
+    return segments_array, majority_labels
+
