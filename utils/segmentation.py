@@ -62,7 +62,7 @@ def segment_acceleration_data_overlapping_numpy_with_curb_activity(
     """
     step = int(window_size * (1 - overlap / 100))
     segments = []
-    majority_labels = []
+    curb_activity = []
     df_sorted = df.sort_values(by='NTP')
     for start in range(0, len(df_sorted) - window_size + 1, step):
         end = start + window_size
@@ -70,8 +70,8 @@ def segment_acceleration_data_overlapping_numpy_with_curb_activity(
         label_segment = df_sorted.iloc[start:end][label_col]
         majority_label = label_segment.mode().iloc[0] if not label_segment.mode().empty else label_segment.iloc[0]
         segments.append(segment)
-        majority_labels.append(majority_label)
+        curb_activity.append(majority_label)
     segments_array = np.array(segments)
-    majority_labels = np.array(majority_labels)
-    return segments_array, majority_labels
+    curb_activity = np.array(curb_activity)
+    return segments_array, curb_activity
 
