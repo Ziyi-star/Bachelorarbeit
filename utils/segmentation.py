@@ -75,3 +75,63 @@ def segment_acceleration_data_overlapping_numpy_with_curb_activity(
     curb_activity = np.array(curb_activity)
     return segments_array, curb_activity
 
+def segment_acceleration_data_overlapping_numpy_with_timestamps(df, window_size=100, overlap=50, channels=['Acc-X', 'Acc-Y', 'Acc-Z']):
+    """
+    Segments acceleration data into overlapping windows and returns numpy arrays with timestamps.
+    
+    Parameters:
+    -----------
+    df : pandas.DataFrame
+        Input DataFrame containing timestamp, acceleration channels, and curb_scene columns.
+    window_size : int
+        Number of samples per segment.
+    overlap : int
+        Percentage overlap (0-99).
+    channels : list
+        List of column names for the channels (default: ['Acc-X', 'Acc-Y', 'Acc-Z']).
+        
+    Returns:
+    --------
+    segments_array : np.ndarray
+        3D numpy array of shape (num_segments, window_size, len(channels)).
+    segment_info : list
+        List of dictionaries containing start_time, end_time, and labels for each segment.
+    """
+    step = int(window_size * (1 - overlap / 100))
+    segments = []
+    segment_info = []
+    
+    df_sorted = df.sort_values(by='NTP').reset_index(drop=True)
+    
+    for start in range(0, len(df_sorted) - window_size + 1, step):
+        end = start + window_size
+        
+        # Extract segment data
+        segment_data = df_sorted.iloc[start:end]
+        segment = segment_data[channels].values
+        segments.append(segment)
+        
+        # Extract timestamp and label information
+        start_time = segment_data['NTP'].iloc[0]
+        end_time = segment_data['NTP'].iloc[-1]
+        
+        # Get labels for this segment (most common values)
+        curb_activity = segment_data['curb_activity'].mode().iloc[0] if 'curb_activity' in df_sorted.columns else None
+        curb_scene = segment_data['curb_scene'].mode().iloc[0] if 'curb_scene' in df_sorted.columns else None
+        
+        segment_info.append({
+            'segment_id': len(segment_info),
+            'start_time': start_time,
+            'end_time': end_time,
+            'start_index': start,
+            'curb_activity': curb_activity,
+            'curb_scene': curb_scene,
+        })
+    
+    # Convert list of arrays to a single 3D numpy array
+    segments_array = np.array(segments)  # shape: (num_segments, window_size, len(channels))
+    
+    return segments_array, segment_info
+
+
+

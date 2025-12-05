@@ -123,6 +123,17 @@ def downsample_to_frequency(df, target_hz, timestamp_col='NTP', output_path=None
     df_downsampled = df.resample(f'{interval_ms}ms').agg(agg_dict)
     # Fills in missing values (NaNs) in the numeric columns of the downsampled DataFrame by interpolation
     df_downsampled[numeric_cols] = df_downsampled[numeric_cols].interpolate()
+    # Fill missing values in categorical columns using forward fill, backward fill
+    # Handle categorical columns - use forward fill, then backward fill
+    for cat in categorical_attributes:
+        # First forward fill (carry last valid observation forward)
+        df_downsampled[cat] = df_downsampled[cat].fillna(method='ffill')
+        # Then backward fill for any remaining NaNs at the beginning
+        df_downsampled[cat] = df_downsampled[cat].fillna(method='bfill')
+        # If still NaNs, fill with most common value
+        if df_downsampled[cat].isna().any():
+            most_common = df[cat].mode().iloc[0] if not df[cat].mode().empty else 0
+            df_downsampled[cat] = df_downsampled[cat].fillna(most_common)
     df_downsampled = df_downsampled.reset_index()
     df_downsampled.to_csv(output_path, index=False)
     return df_downsampled
