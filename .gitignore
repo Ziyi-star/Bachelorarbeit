@@ -14,6 +14,7 @@ models/
 # Jupyter Notebook
 .ipynb_checkpoints
 */.ipynb_checkpoints/*
+notebooks/field_validation/field_validation_preprocessing.ipynb
 
 # Python
 __pycache__/
