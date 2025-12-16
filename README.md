@@ -4,7 +4,7 @@ A machine learning project for classifying road surfaces and detecting curbs usi
 
 ## Overview
 
-This project uses deep learning and the SimCLR (Simple Framework for Contrastive Learning of Visual Representations) approach to classify different road surface types and detect curb crossings based on 3-axis accelerometer data. The system supports both laboratory-controlled environments and real-world cycling scenarios.
+This project uses deep learning and the SimCLR (Simple Framework for Contrastive Learning adapted for HAR) approach to classify different road surface types and detect curb crossings based on 3-axis accelerometer data. The system supports both laboratory-controlled environments and real world cycling scenarios.
 
 ## Project Structure
 
@@ -12,7 +12,7 @@ This project uses deep learning and the SimCLR (Simple Framework for Contrastive
 ├── data/                           # Raw and processed data
 │   ├── Curb/                     # Curb detection data from participants (P3, P6, P11, P12, P18, P21)
 │   ├── Field_validation/         # Field validation datasets at various sampling rates
-│   ├── Real_world_cycling/       # Real-world cycling datasets
+│   ├── Real_world_cycling/       # Real world cycling datasets
 │   ├── RoadRoughness/            # Laboratory road surface data
 │   └── Training/                 # Processed training datasets
 │       ├── 1s_100hz/             # 1 second windows at 100Hz
@@ -74,7 +74,7 @@ This project uses deep learning and the SimCLR (Simple Framework for Contrastive
 2. **Dataset Combination & Train-Test Split** ([`notebooks/preprocessing/combine_train_test_spilt/`](notebooks/preprocessing/combine_train_test_spilt/))
    - Combine preprocessed segments from all participants
    - Stratified train-test split (80/20)
-   - leave one man out strategy
+   - leave one man out strategy 
    - Class balancing (oversampling/undersampling)
    - Generate dataset statistics and participant metadata
 
@@ -91,7 +91,7 @@ This project uses deep learning and the SimCLR (Simple Framework for Contrastive
    - Initialize with pre-trained encoder weights
    - Train on labeled data for specific classification tasks
    - Two training scenarios:
-     - **2-class**: Curb vs. non-curb detection
+     - **2-class**: Curb vs. no-curb detection
      - **7-class**: Multi-surface classification
    - Freezing/unfreezing strategies for transfer learning
    
@@ -138,25 +138,25 @@ NumPy arrays with shape:
 
 Navigate to [`notebooks/training/`](notebooks/training/) and use the Jupyter notebooks:
 
-- **2-class (Curb Detection)**:
+- **Labtorary 2-class (Curb Detection)**:
   - [`train_1s_100hz_2class_balanced.ipynb`](notebooks/training/train_1s_100hz_2class_balanced.ipynb)
   - [`train_1s_100hz_2class_unbalanced.ipynb`](notebooks/training/train_1s_100hz_2class_unbalanced.ipynb)
   - [`train_1s_30hz_2class_unbalanced.ipynb`](notebooks/training/train_1s_30hz_2class_unbalanced.ipynb)
 
-- **7-class (Surface Classification)**:
+- **Labtorary 7-class (Surface Classification)**:
   - [`train_1s_100hz_7class.ipynb`](notebooks/training/train_1s_100hz_7class.ipynb)
   - [`train_1s_30hz_7_class.ipynb`](notebooks/training/train_1s_30hz_7_class.ipynb)
 
 - **Real world Evaluation**:
-- **Real-World Training & Evaluation**:
+- **Real World Training & Evaluation**:
   - [`train_1s_30hz_2class_real_world_phase_1_to_3_version_a.ipynb`](notebooks/training/train_1s_30hz_2class_real_world_phase_1_to_3_version_a.ipynb): Subject A for test
   - [`train_1s_30hz_2class_real_world_phase_1_to_3_version_b.ipynb`](notebooks/training/train_1s_30hz_2class_real_world_phase_1_to_3_version_b.ipynb): Subject B for test
   - [`train_1s_30hz_2class_real_world_phase_1_to_3_version_c.ipynb`](notebooks/training/train_1s_30hz_2class_real_world_phase_1_to_3_version_c.ipynb): Subject C for test
   - [`train_1s_30hz_2class_real_world_phase_1_to_3_version_d.ipynb`](notebooks/training/train_1s_30hz_2class_real_world_phase_1_to_3_version_d.ipynb): Subject D for test
   - [`train_1s_30hz_2class_real_world_phase_4_to_5_version_a.ipynb`](notebooks/training/train_1s_30hz_2class_real_world_phase_4_to_5_version_a.ipynb): Extended phase using pseudo labels
 
-  **Multi-phase Training Strategy**:
-  - Phase 1-3: Initial pre-training and fine-tuning on real-world data
+  **Multi phase Training Strategy**:
+  - Phase 1-3: Initial pre-training and fine-tuning on real world data
   - Phase 4-5: Advanced training with expanded datasets
   - Cross-subject validation for generalization assessment
 
@@ -177,7 +177,7 @@ Navigate to [`notebooks/training/`](notebooks/training/) and use the Jupyter not
 - **Window Size**: 30 samples (1.0 second)
 - **Sampling Rate**: 30Hz
 - **Overlap**: 50%
-- **Configurations**: Suject (a, b, c, d) for real-world scenarios
+- **Configurations**: Suject (a, b, c, d) for real world scenarios
 - **Model Location**: [`models/1s_30hz/`](models/1s_30hz/)
 
 ## Contributing
