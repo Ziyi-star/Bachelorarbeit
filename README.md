@@ -59,49 +59,59 @@ This project uses deep learning and the SimCLR (Simple Framework for Contrastive
 - **No-curb** (Class 0) - Normal cycling
 - **Curb** (Class 1) - Curb crossing
 
-## Key Features
 
 ### Data Processing Pipeline
 
-1. **Raw Data Import**
-   - Laboratory-controlled surface recordings
-   - Real-world cycling sessions with GPS tracking
-   - Multiple participant data collection
-
-2. **Preprocessing** ([`utils/preprocessing.py`](utils/preprocessing.py))
-   - Timestamp normalization
+1. **Preprocessing & Segmentation** ([`notebooks/preprocessing/data_processing])
    - Missing value imputation
-   - Data filtering and cleaning
    - Downsampling to target frequencies (30Hz or 100Hz)
    - Standard normalization (zero mean, unit variance)
-
-3. **Segmentation** ([`utils/segmentation.py`](utils/segmentation.py))
    - Sliding window approach with configurable overlap
    - Window sizes: 0.5s (50 samples) or 1.0s (100 samples) at 100Hz
    - Window sizes: 1.0s (30 samples) at 30Hz
    - 50% overlap between consecutive windows
    - Label assignment based on majority voting
+2. **Dataset Combination & Train-Test Split** ([`notebooks/preprocessing/combine_train_test_spilt/`](notebooks/preprocessing/combine_train_test_spilt/))
+   - Combine preprocessed segments from all participants
+   - Stratified train-test split (80/20)
+   - leave one man out strategy
+   - Class balancing (oversampling/undersampling)
+   - Generate dataset statistics and participant metadata
 
-4. **Data Augmentation** ([`notebooks/training/transformations.py`](notebooks/training/transformations.py))
-   - Gaussian noise injection
-   - Amplitude scaling
-   - Axis rotation
-   - Time warping
-   - Channel shuffling
+3. **Training using SimCLR** ([`notebooks/training/`](notebooks/training/))
+   
+   **Pre-training Phase** (Self-supervised Learning):
+   - Train on unlabeled accelerometer data to learn general features
+   - Apply data augmentations: noise injection, scaling, rotation, time warping, channel shuffling
+   - Use contrastive loss (NT-Xent) to maximize agreement between augmented views
+   - Base encoder: CNN architecture for time-series feature extraction
+   - Projection head: MLP for mapping to contrastive learning space
+   
+   **Fine-tuning Phase** (Supervised Learning):
+   - Initialize with pre-trained encoder weights
+   - Train on labeled data for specific classification tasks
+   - Two training scenarios:
+     - **2-class**: Curb vs. non-curb detection
+     - **7-class**: Multi-surface classification
+   - Freezing/unfreezing strategies for transfer learning
+   
+   **Training Configurations**:
+   - Batch size: 128
+   - Learning rate: 0.001 with decay
+   - Optimizer: Adam
+   - Epochs: 50-100 (with early stopping)
+   - Data augmentation probability: 50%
+   
+   **Model Variants**:
+   - [`1s_100hz_unbalanced/`](models/1s_100hz_unbalanced/): High-frequency models with natural class distribution
+   - [`1s_30hz/`](models/1s_30hz/): Lower-frequency models for resource-constrained scenarios
+   - Training notebooks available for both balanced and unbalanced datasets
 
-### Model Architecture
+4. **Field Validation Analyse** ([`notebooks/field_validation/`](notebooks/field_validation)
+   - Real-world cycling data
+   - Ground truth annotation using video timestamps
+   - False negative analysis with video matching
 
-The project implements SimCLR-based contrastive learning:
-
-- **Pre-training Phase**: Self-supervised learning on unlabeled data
-- **Fine-tuning Phase**: Supervised learning on labeled data
-- **Architecture**: CNN-based feature extractor with projection head
-- **Loss Function**: Contrastive loss (NT-Xent)
-
-**Key Files:**
-- [`notebooks/training/simclr_models.py`](notebooks/training/simclr_models.py) - Model architecture
-- [`notebooks/training/simclr_utitlities.py`](notebooks/training/simclr_utitlities.py) - Training utilities
-- [`notebooks/training/data_pre_processing.py`](notebooks/training/data_pre_processing.py) - Data preprocessing
 
 ## Data Format
 
@@ -123,69 +133,6 @@ NumPy arrays with shape:
 - **2-class**: Binary labels (0=non-curb, 1=curb)
 - **7-class**: Categorical labels (0-6 for each surface type)
 
-## Usage
-
-### Visualization
-
-```python
-import sys
-sys.path.append('utils/')
-from visualization import *
-import pandas as pd
-
-# Load accelerometer data
-df = pd.read_csv('data/RoadRoughness/Raw/Asphalt/P1/Accelerometer_filtered.csv')
-
-# Check sampling frequency
-print_sampling_frequency(df)
-
-# Interactive visualization with Plotly
-plot_accelerometer_data(df, "Asphalt Surface")
-
-# Publication-quality plot with Matplotlib
-plot_accelerometer_data_bachelorarbeit(df)
-```
-
-### Data Preprocessing
-
-```python
-from preprocessing import *
-
-# Downsample to 100Hz
-df_100hz = downsample_to_frequency(df, target_hz=100, timestamp_col='NTP')
-
-# Normalize acceleration data
-data_normalized = normalize_3d_data(df_100hz[['Acc-X', 'Acc-Y', 'Acc-Z']].values)
-
-# Random sampling for balanced datasets
-df_balanced = select_random_samples(df_100hz, n_samples=1000, random_state=42)
-```
-
-### Data Segmentation
-
-```python
-from segmentation import *
-
-# Segment data with 50% overlap
-segments = segment_acceleration_data_overlapping_numpy(
-    df_100hz,
-    window_size=100,      # 1 second at 100Hz
-    overlap=50,           # 50% overlap
-    channels=['Acc-X', 'Acc-Y', 'Acc-Z']
-)
-
-# Segment with labels
-segments, labels = segment_acceleration_data_overlapping_numpy_with_curb_activity(
-    df_100hz,
-    window_size=100,
-    overlap=50,
-    channels=['Acc-X', 'Acc-Y', 'Acc-Z'],
-    label_col='curb_activity'
-)
-
-print(f"Segments shape: {segments.shape}")  # (n_segments, 100, 3)
-print(f"Labels shape: {labels.shape}")      # (n_segments,)
-```
 
 ### Training Models
 
@@ -201,7 +148,17 @@ Navigate to [`notebooks/training/`](notebooks/training/) and use the Jupyter not
   - [`train_1s_30hz_7_class.ipynb`](notebooks/training/train_1s_30hz_7_class.ipynb)
 
 - **Real world Evaluation**:
+- **Real-World Training & Evaluation**:
+  - [`train_1s_30hz_2class_real_world_phase_1_to_3_version_a.ipynb`](notebooks/training/train_1s_30hz_2class_real_world_phase_1_to_3_version_a.ipynb): Subject A for test
+  - [`train_1s_30hz_2class_real_world_phase_1_to_3_version_b.ipynb`](notebooks/training/train_1s_30hz_2class_real_world_phase_1_to_3_version_b.ipynb): Subject B for test
+  - [`train_1s_30hz_2class_real_world_phase_1_to_3_version_c.ipynb`](notebooks/training/train_1s_30hz_2class_real_world_phase_1_to_3_version_c.ipynb): Subject C for test
+  - [`train_1s_30hz_2class_real_world_phase_1_to_3_version_d.ipynb`](notebooks/training/train_1s_30hz_2class_real_world_phase_1_to_3_version_d.ipynb): Subject D for test
+  - [`train_1s_30hz_2class_real_world_phase_4_to_5_version_a.ipynb`](notebooks/training/train_1s_30hz_2class_real_world_phase_4_to_5_version_a.ipynb): Extended phase using pseudo labels
 
+  **Multi-phase Training Strategy**:
+  - Phase 1-3: Initial pre-training and fine-tuning on real-world data
+  - Phase 4-5: Advanced training with expanded datasets
+  - Cross-subject validation for generalization assessment
 
 - **Field Evaluation**:
   - [`field_evaluation_1s_100hz_analyse.ipynb`](notebooks/training/field_evaluation_1s_100hz_analyse.ipynb)
@@ -222,14 +179,6 @@ Navigate to [`notebooks/training/`](notebooks/training/) and use the Jupyter not
 - **Overlap**: 50%
 - **Configurations**: Suject (a, b, c, d) for real-world scenarios
 - **Model Location**: [`models/1s_30hz/`](models/1s_30hz/)
-
-## Evaluation
-
-The project includes comprehensive field validation:
-- Real-world cycling sessions with multiple participants
-- Various weather and road conditions
-- Performance metrics: accuracy, precision, recall, F1-score
-- Confusion matrices and classification reports
 
 ## Contributing
 
