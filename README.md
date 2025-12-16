@@ -2,11 +2,11 @@
 
 A machine learning project for classifying road surfaces and detecting curbs using accelerometer(x,y,z) data collected from bicycle handlebar sensors during cycling.
 
-## 📋 Overview
+## Overview
 
 This project uses deep learning and the SimCLR (Simple Framework for Contrastive Learning of Visual Representations) approach to classify different road surface types and detect curb crossings based on 3-axis accelerometer data. The system supports both laboratory-controlled environments and real-world cycling scenarios.
 
-## 🗂️ Project Structure
+## Project Structure
 
 ```
 ├── data/                           # Raw and processed data
@@ -44,7 +44,7 @@ This project uses deep learning and the SimCLR (Simple Framework for Contrastive
     └── visualization.py          # Plotting and visualization
 ```
 
-## 🎯 Classification Tasks
+## Classification Tasks
 
 ### Road Surface Types (7-class)
 - **Asphalt** - Smooth paved roads
@@ -59,7 +59,7 @@ This project uses deep learning and the SimCLR (Simple Framework for Contrastive
 - **No-curb** (Class 0) - Normal cycling
 - **Curb** (Class 1) - Curb crossing
 
-## 🔧 Key Features
+## Key Features
 
 ### Data Processing Pipeline
 
@@ -103,7 +103,7 @@ The project implements SimCLR-based contrastive learning:
 - [`notebooks/training/simclr_utitlities.py`](notebooks/training/simclr_utitlities.py) - Training utilities
 - [`notebooks/training/data_pre_processing.py`](notebooks/training/data_pre_processing.py) - Data preprocessing
 
-## 📊 Data Format
+## Data Format
 
 ### Raw Accelerometer Data
 CSV files with the following columns:
@@ -123,7 +123,7 @@ NumPy arrays with shape:
 - **2-class**: Binary labels (0=non-curb, 1=curb)
 - **7-class**: Categorical labels (0-6 for each surface type)
 
-## 🚀 Usage
+## Usage
 
 ### Visualization
 
@@ -200,14 +200,14 @@ Navigate to [`notebooks/training/`](notebooks/training/) and use the Jupyter not
   - [`train_1s_100hz_7class.ipynb`](notebooks/training/train_1s_100hz_7class.ipynb)
   - [`train_1s_30hz_7_class.ipynb`](notebooks/training/train_1s_30hz_7_class.ipynb)
 
-- **SimCLR Pre-training**:
-  - [`train_1s_100hz_pretraining_feintuning.ipynb`](notebooks/training/train_1s_100hz_pretraining_feintuning.ipynb)
+- **Real world Evaluation**:
 
-- **Real-world Evaluation**:
+
+- **Field Evaluation**:
   - [`field_evaluation_1s_100hz_analyse.ipynb`](notebooks/training/field_evaluation_1s_100hz_analyse.ipynb)
   - [`field_evaluation_1s_30hz_analyse.ipynb`](notebooks/training/field_evaluation_1s_30hz_analyse.ipynb)
 
-## 🔬 Experimental Configurations
+## Experimental Configurations
 
 ### Configuration 1: 1s Window at 100Hz (Unbalanced)
 - **Window Size**: 100 samples (1.0 second)
@@ -227,31 +227,30 @@ Navigate to [`notebooks/training/`](notebooks/training/) and use the Jupyter not
 
 The project includes comprehensive field validation:
 - Real-world cycling sessions with multiple participants
-- GPS-annotated routes
 - Various weather and road conditions
 - Performance metrics: accuracy, precision, recall, F1-score
 - Confusion matrices and classification reports
 
-## 🤝 Contributing
+## Contributing
 
 This is a Bachelor's thesis project. For questions or collaboration:
 1. Review the notebooks in [`notebooks/`](notebooks/)
 2. Check utility functions in [`utils/`](utils/)
 3. Examine trained models in [`models/`](models/)
 
-## 📄 License
+## License
 
 This project uses code adapted from SimCLR implementations:
 - Licensed under GNU General Public License v3.0
 - Based on Tang et al. SimCLR work (https://arxiv.org/abs/2011.11542)
 
-## 🏫 Academic Context
+## Academic Context
 
 **Project Type**: Bachelor's Thesis (Bachelorarbeit)  
 **Topic**: Road Surface Classification and Curb Detection using Deep Learning on Accelerometer Data  
 **Data Source**: Bicycle handlebar-mounted accelerometer sensors
 
-## 📞 Contact
+## Contact
 
 Repository: [Ziyi-star/Bachelorarbeit](https://github.com/Ziyi-star/Bachelorarbeit)
 
