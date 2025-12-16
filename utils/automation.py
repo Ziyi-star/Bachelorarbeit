@@ -2,10 +2,37 @@ import pandas as pd
 import numpy as np
 import sys
 import os
-
 sys.path.append('../../')   # Add parent directory to Python path
 from utils.preprocessing import *
 from utils.segmentation import *
+
+__author__ = "Ziyi Liu"
+__copyright__ = """Copyright (C) 2024-2025 Ziyi Liu"""
+
+"""
+Utility functions for analyzing model predictions and matching false negatives to video data.
+
+Author: Ziyi Liu
+Project: Bachelor's Thesis - Cyclist Curb Detection under Varying Road Roughness
+Institution: Universität Kassel
+License: GNU General Public License v3.0
+
+Based on work of Tang et al.: https://arxiv.org/abs/2011.11542
+Original contact: cit27@cl.cam.ac.uk
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program. If not, see <https://www.gnu.org/licenses/>.
+"""
 
 def preprocess_and_segment_curb(esp1_path, esp2_path, combined_output_path,freq_list, window_sizes, overlap, channels, scene_col='curb_scene'):
     """
