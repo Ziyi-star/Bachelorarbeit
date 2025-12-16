@@ -106,8 +106,6 @@ def downsample_to_frequency(df, target_hz, timestamp_col='NTP', output_path=None
     Returns:
         pd.DataFrame: Downsampled DataFrame at the target frequency.
     """
-    import numpy as np
-
     df[timestamp_col] = pd.to_datetime(df[timestamp_col])
     df = df.set_index(timestamp_col)
     interval_ms = int(1000 / target_hz)
