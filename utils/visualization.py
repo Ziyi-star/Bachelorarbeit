@@ -2,6 +2,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import plotly.graph_objects as go
 import matplotlib.dates as mdates
+import numpy as np
 
 
 
@@ -61,16 +62,17 @@ def plot_accelerometer_data_bachelorarbeit(df):
     plt.plot(df.index, df['Acc-X'], label='Acc-X', zorder=3)
     plt.plot(df.index, df['Acc-Y'], label='Acc-Y', zorder=2)
     plt.plot(df.index, df['Acc-Z'], label='Acc-Z', zorder=1)
-    plt.legend()
+    plt.legend(fontsize=14)
     plt.grid()
     # Rotate date labels
     plt.gcf().autofmt_xdate()
-    plt.xticks(rotation=45)
+    plt.xticks(rotation=45, fontsize=20)
+    plt.yticks(fontsize=20)
     # Get the current axes and set major ticks every 200 seconds
     ax = plt.gca()
     ax.xaxis.set_major_locator(mdates.SecondLocator(interval=200))
-    plt.xlabel('Time')
-    plt.ylabel('Acceleration (m/s^2)')
+    plt.xlabel('Time', fontsize=20)
+    plt.ylabel('Acceleration (m/s^2)', fontsize=20)
     plt.show()
 
 # Create a figure with 3 subplots (one for each axis)
@@ -86,9 +88,12 @@ def plot_sample_data_numpy_bachelorarbeit(sample_data, title="Acceleration Data"
     plt.plot(time_steps, sample_data[:, 2], label='Z-axis')
     
     plt.title(title)
-    plt.xlabel('Time Steps')
-    plt.ylabel('Acceleration')
+    plt.xlabel('Time Steps', fontsize = 20)
+    plt.ylabel('Acceleration(m/s^2)', fontsize =20)
     plt.legend()
+    plt.xticks(fontsize=20)
+    plt.yticks(fontsize=20)
+    plt.legend(fontsize=20)
     plt.grid(True)
     plt.tight_layout()
     plt.show()
