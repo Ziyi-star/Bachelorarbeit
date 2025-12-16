@@ -157,7 +157,7 @@ Navigate to [`notebooks/training/`](notebooks/training/) and use the Jupyter not
 
   **Multi phase Training Strategy**:
   - Phase 1-3: Initial pre-training and fine-tuning on real world data
-  - Phase 4-5: Advanced training with expanded datasets
+  - Phase 4-5: Advanced training with pseudo labels
   - Cross-subject validation for generalization assessment
 
 - **Field Evaluation**:
