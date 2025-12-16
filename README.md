@@ -1,6 +1,6 @@
-# Bachelorarbeit - Road Surface Classification using Accelerometer Data
+# Bachelorarbeit - Cyclist Curb Detection under Varying Road Roughness in the Real World Using Contrastive Learning
 
-A machine learning project for classifying road surfaces and detecting curbs using accelerometer data collected from bicycle handlebar sensors during cycling.
+A machine learning project for classifying road surfaces and detecting curbs using accelerometer(x,y,z) data collected from bicycle handlebar sensors during cycling.
 
 ## 📋 Overview
 
@@ -10,32 +10,31 @@ This project uses deep learning and the SimCLR (Simple Framework for Contrastive
 
 ```
 ├── data/                           # Raw and processed data
-│   ├── Curb/                      # Curb detection data from participants (P3, P6, P11, P12, P18, P21)
+│   ├── Curb/                     # Curb detection data from participants (P3, P6, P11, P12, P18, P21)
 │   ├── Field_validation/         # Field validation datasets at various sampling rates
-│   ├── Real_world_cycling/       # Real-world cycling sessions
-│   ├── RoadRoughness/            # Laboratory road surface type data
+│   ├── Real_world_cycling/       # Real-world cycling datasets
+│   ├── RoadRoughness/            # Laboratory road surface data
 │   └── Training/                 # Processed training datasets
-│       ├── 0.5s_100hz/           # 0.5 second windows at 100Hz
 │       ├── 1s_100hz/             # 1 second windows at 100Hz
 │       └── 1s_30hz/              # 1 second windows at 30Hz
+│       
 │
-├── models/                        # Trained models and checkpoints
+├── models/                        # Trained models
 │   ├── 1s_100hz_unbalanced/     # Models for 100Hz unbalanced data
 │   └── 1s_30hz/                 # Models for 30Hz data
-│       ├── 2class_unbalanced_lab/
+│       ├── 2class_unbalanced_lab/     
 │       ├── 2class_unbalanced_real_world_a/
 │       ├── 2class_unbalanced_real_world_a_with_pseudo/
 │       └── 7class_balanced/
 │
-├── notebooks/                     # Jupyter notebooks for analysis
+├── notebooks/                     # Jupyter notebooks for running code
 │   ├── field_validation/         # Field validation and preprocessing
-│   ├── models/                   # Model evaluation notebooks
 │   ├── preprocessing/            # Data preprocessing pipelines
 │   │   ├── data_processing/      # Individual surface type processing
-│   │   └── combine_train_test_spilt/  # Dataset combination and splitting
+│   │   └── combine_train_test_spilt/  # Dataset combination and train split
 │   ├── training/                 # Model training workflows
-│   ├── training_data/            # Training data analysis
-│   └── visualization/            # Data visualization notebooks
+│   ├── training_data/            # Training data uploaded for Colab access 
+│   └── visualization/            # Data visualization
 │
 └── utils/                         # Utility modules
     ├── analyse.py                # Analysis functions
@@ -53,12 +52,12 @@ This project uses deep learning and the SimCLR (Simple Framework for Contrastive
 - **Compact Gravel** - Compressed gravel paths
 - **Dirt** - Unpaved dirt roads
 - **Paving Stone** - Brick or stone paving
-- **Curb Scene 0** - Normal road before curb
+- **Curb Scene 0** - Paving Stone (pattern b)
 - **Curb Scene 1** - Curb crossing event
 
 ### Curb Detection (2-class)
-- **Non-curb** (Class 0) - Normal road surface
-- **Curb** (Class 1) - Curb crossing detection
+- **No-curb** (Class 0) - Normal cycling
+- **Curb** (Class 1) - Curb crossing
 
 ## 🔧 Key Features
 
@@ -208,25 +207,6 @@ Navigate to [`notebooks/training/`](notebooks/training/) and use the Jupyter not
   - [`field_evaluation_1s_100hz_analyse.ipynb`](notebooks/training/field_evaluation_1s_100hz_analyse.ipynb)
   - [`field_evaluation_1s_30hz_analyse.ipynb`](notebooks/training/field_evaluation_1s_30hz_analyse.ipynb)
 
-## 📦 Requirements
-
-### Python Packages
-```
-pandas
-numpy
-matplotlib
-plotly
-scikit-learn
-tensorflow / keras
-scipy
-```
-
-### Installation
-
-```bash
-pip install pandas numpy matplotlib plotly scikit-learn tensorflow scipy
-```
-
 ## 🔬 Experimental Configurations
 
 ### Configuration 1: 1s Window at 100Hz (Unbalanced)
@@ -240,14 +220,8 @@ pip install pandas numpy matplotlib plotly scikit-learn tensorflow scipy
 - **Window Size**: 30 samples (1.0 second)
 - **Sampling Rate**: 30Hz
 - **Overlap**: 50%
-- **Configurations**: Multiple variants (a, b, c, d) for real-world scenarios
+- **Configurations**: Suject (a, b, c, d) for real-world scenarios
 - **Model Location**: [`models/1s_30hz/`](models/1s_30hz/)
-
-### Configuration 3: 0.5s Window at 100Hz
-- **Window Size**: 50 samples (0.5 seconds)
-- **Sampling Rate**: 100Hz
-- **Overlap**: 50%
-- **Data Location**: [`data/Training/0.5s_100hz/`](data/Training/0.5s_100hz/)
 
 ## 📈 Evaluation
 
