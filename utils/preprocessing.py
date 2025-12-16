@@ -309,6 +309,57 @@ def normalize_3d_data(data):
 
     return data_normalized
 
+def label_curb_scenes_real_world(df_data, df_curb, save_path=None):
+    """
+    Labels curb scenes in the accelerometer data using timestamp ranges.
+    
+    Args:
+        df_data (pd.DataFrame): Accelerometer data with NTP timestamps
+        df_curb (pd.DataFrame): Label data with timestamps and labels
+        save_path (str, optional): Path to save labeled data
+        
+    Returns:
+        pd.DataFrame: Labeled accelerometer data
+    """
+    # Create copy with selected columns
+    count = 0
+    df_selected = df_data[['NTP', 'Acc-X', 'Acc-Y', 'Acc-Z']].copy()
+    
+    # Initialize curb_activity column with 0
+    df_selected['curb_activity'] = 0
+    df_selected['curb_scene'] = 0
+    
+    # Convert timestamps to datetime
+    df_selected['NTP'] = pd.to_datetime(df_selected['NTP'])
+    df_curb['Timestamp'] = pd.to_datetime(df_curb['Timestamp'])
+    
+    valid_labels = df_curb.copy()
+    print(f"Total rows in labels: {len(valid_labels)}")
+    
+    count = 0
+    # Process events
+    for idx in range(len(valid_labels)-1):
+        current_label = valid_labels.iloc[idx]['Label']
+        next_label = valid_labels.iloc[idx+1]['Label']
+        
+        if current_label not in [0] and next_label == 0:
+            start_time = valid_labels.iloc[idx]['Timestamp']
+            end_time = valid_labels.iloc[idx+1]['Timestamp']
+            count += 1
+            
+            # Label data points between start and end time
+            mask = (df_selected['NTP'] >= start_time) & (df_selected['NTP'] <= end_time)
+            df_selected.loc[mask, 'curb_activity'] = current_label
+    
+    # Create curb_scene column based on condition
+    df_selected['curb_scene'] = (~df_selected['curb_activity'].isin([0, 8, 9])).astype(int)
+    
+    print(f"Total label pairs found: {count}")
+
+    if save_path:
+        df_selected.to_csv(save_path, index=False)
+    return df_selected
+
 
 
 
