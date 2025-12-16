@@ -223,7 +223,7 @@ Navigate to [`notebooks/training/`](notebooks/training/) and use the Jupyter not
 - **Configurations**: Suject (a, b, c, d) for real-world scenarios
 - **Model Location**: [`models/1s_30hz/`](models/1s_30hz/)
 
-## 📈 Evaluation
+## Evaluation
 
 The project includes comprehensive field validation:
 - Real-world cycling sessions with multiple participants
@@ -243,16 +243,6 @@ This is a Bachelor's thesis project. For questions or collaboration:
 This project uses code adapted from SimCLR implementations:
 - Licensed under GNU General Public License v3.0
 - Based on Tang et al. SimCLR work (https://arxiv.org/abs/2011.11542)
-
-## Academic Context
-
-**Project Type**: Bachelor's Thesis (Bachelorarbeit)  
-**Topic**: Road Surface Classification and Curb Detection using Deep Learning on Accelerometer Data  
-**Data Source**: Bicycle handlebar-mounted accelerometer sensors
-
-## Contact
-
-Repository: [Ziyi-star/Bachelorarbeit](https://github.com/Ziyi-star/Bachelorarbeit)
 
 ---
 
