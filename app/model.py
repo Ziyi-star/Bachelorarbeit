@@ -1,14 +1,16 @@
 from pathlib import Path
-import re
 from tensorflow.keras.models import load_model
 
-BASE_DIR = Path(__file__).resolve().parent
 
-model = load_model(
-    BASE_DIR / "20251208-101322_simclr_full_eval.keras",
-    compile=False,
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
+
+MODEL_PATH = (
+    PROJECT_ROOT
+    / "models"
+    / "1s_30hz"
+    / "2class_unbalanced_lab"
+    / "20251128-121500_simclr_full_eval.keras"
 )
-
 
 classes = [
     "Normal cycling", 
@@ -16,6 +18,5 @@ classes = [
 ]
 
 
-#preprocessing helper function
-def segmentation_pipeline(data):
+#preprocessing helper function: segment_acceleration_data_overlapping_numpy
     
