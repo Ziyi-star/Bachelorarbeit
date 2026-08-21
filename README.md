@@ -17,12 +17,12 @@ This project uses deep learning and the SimCLR (Simple Framework for Contrastive
 │   └── Training/                 # Processed training datasets
 │       ├── 1s_100hz/             # 1 second windows at 100Hz
 │       └── 1s_30hz/              # 1 second windows at 30Hz
-│       
+│
 │
 ├── models/                        # Trained models
 │   ├── 1s_100hz_unbalanced/     # Models for 100Hz unbalanced data
 │   └── 1s_30hz/                 # Models for 30Hz data
-│       ├── 2class_unbalanced_lab/     
+│       ├── 2class_unbalanced_lab/
 │       ├── 2class_unbalanced_real_world_a/
 │       ├── 2class_unbalanced_real_world_a_with_pseudo/
 │       └── 7class_balanced/
@@ -33,7 +33,7 @@ This project uses deep learning and the SimCLR (Simple Framework for Contrastive
 │   │   ├── data_processing/      # Individual surface type processing
 │   │   └── combine_train_test_spilt/  # Dataset combination and train split
 │   ├── training/                 # Model training workflows
-│   ├── training_data/            # Training data uploaded for Colab access 
+│   ├── training_data/            # Training data uploaded for Colab access
 │   └── visualization/            # Data visualization
 │
 └── utils/                         # Utility modules
@@ -47,6 +47,7 @@ This project uses deep learning and the SimCLR (Simple Framework for Contrastive
 ## Classification Tasks
 
 ### Road Surface Types (7-class)
+
 - **Asphalt** - Smooth paved roads
 - **Cobblestone** - Traditional stone pavement
 - **Compact Gravel** - Compressed gravel paths
@@ -56,9 +57,9 @@ This project uses deep learning and the SimCLR (Simple Framework for Contrastive
 - **Curb Scene 1** - Curb crossing event
 
 ### Curb Detection (2-class)
+
 - **No-curb** (Class 0) - Normal cycling
 - **Curb** (Class 1) - Curb crossing
-
 
 ### Data Processing Pipeline
 
@@ -74,19 +75,19 @@ This project uses deep learning and the SimCLR (Simple Framework for Contrastive
 2. **Dataset Combination & Train-Test Split** ([`notebooks/preprocessing/combine_train_test_spilt/`](notebooks/preprocessing/combine_train_test_spilt/))
    - Combine preprocessed segments from all participants
    - Stratified train-test split (80/20)
-   - leave one man out strategy 
+   - leave one man out strategy
    - Class balancing (oversampling/undersampling)
    - Generate dataset statistics and participant metadata
 
 3. **Training using SimCLR** ([`notebooks/training/`](notebooks/training/))
-   
+
    **Pre-training Phase** (Self-supervised Learning):
    - Train on unlabeled accelerometer data to learn general features
    - Apply data augmentations: noise injection, scaling, rotation, time warping, channel shuffling
    - Use contrastive loss (NT-Xent) to maximize agreement between augmented views
    - Base encoder: CNN architecture for time-series feature extraction
    - Projection head: MLP for mapping to contrastive learning space
-   
+
    **Fine-tuning Phase** (Supervised Learning):
    - Initialize with pre-trained encoder weights
    - Train on labeled data for specific classification tasks
@@ -94,14 +95,14 @@ This project uses deep learning and the SimCLR (Simple Framework for Contrastive
      - **2-class**: Curb vs. no-curb detection
      - **7-class**: Multi-surface classification
    - Freezing/unfreezing strategies for transfer learning
-   
+
    **Training Configurations**:
    - Batch size: 128
    - Learning rate: 0.001 with decay
    - Optimizer: Adam
    - Epochs: 50-100 (with early stopping)
    - Data augmentation probability: 50%
-   
+
    **Model Variants**:
    - [`1s_100hz_unbalanced/`](models/1s_100hz_unbalanced/): High-frequency models with natural class distribution
    - [`1s_30hz/`](models/1s_30hz/): Lower-frequency models for resource-constrained scenarios
@@ -112,27 +113,30 @@ This project uses deep learning and the SimCLR (Simple Framework for Contrastive
    - Ground truth annotation using video timestamps
    - False negative analysis with video matching
 
-
 ## Data Format
 
 ### Raw Accelerometer Data
+
 CSV files with the following columns:
+
 - `NTP` - Network Time Protocol timestamp
 - `Acc-X` - X-axis acceleration (m/s²)
 - `Acc-Y` - Y-axis acceleration (m/s²)
 - `Acc-Z` - Z-axis acceleration (m/s²)
 
 ### Processed Segments
+
 NumPy arrays with shape:
+
 - `(n_samples, window_size, 3)` - 3D array where:
   - `n_samples`: number of segments
   - `window_size`: 30, 50, or 100 (depending on configuration)
   - `3`: X, Y, Z acceleration channels
 
 ### Labels
+
 - **2-class**: Binary labels (0=non-curb, 1=curb)
 - **7-class**: Categorical labels (0-6 for each surface type)
-
 
 ### Training Models
 
@@ -167,6 +171,7 @@ Navigate to [`notebooks/training/`](notebooks/training/) and use the Jupyter not
 ## Experimental Configurations
 
 ### Configuration 1: 1s Window at 100Hz (Unbalanced)
+
 - **Window Size**: 100 samples (1.0 second)
 - **Sampling Rate**: 100Hz
 - **Overlap**: 50%
@@ -174,15 +179,53 @@ Navigate to [`notebooks/training/`](notebooks/training/) and use the Jupyter not
 - **Model Location**: [`models/1s_100hz_unbalanced/`](models/1s_100hz_unbalanced/)
 
 ### Configuration 2: 1s Window at 30Hz
+
 - **Window Size**: 30 samples (1.0 second)
 - **Sampling Rate**: 30Hz
 - **Overlap**: 50%
 - **Configurations**: Suject (a, b, c, d) for real world scenarios
 - **Model Location**: [`models/1s_30hz/`](models/1s_30hz/)
 
+## Run with Docker (Windows, macOS, Linux)
+
+This repository can run in a Docker container so your environment is identical across platforms.
+
+### 1. Build and start Jupyter Lab
+
+From the repository root:
+
+```bash
+docker compose up --build
+```
+
+Then open:
+
+```text
+http://localhost:8888
+```
+
+### 2. Stop the container
+
+```bash
+docker compose down
+```
+
+### 3. Run a one-off Python command in the same environment
+
+```bash
+docker compose run --rm bachelorarbeit python -c "import tensorflow as tf; print(tf.__version__)"
+```
+
+### Notes
+
+- The compose setup mounts the repository into `/workspace`, so notebook edits and outputs persist on your host machine.
+- Large folders (`data/`, `models/`) are excluded from image build context via `.dockerignore` to keep builds fast. They are still available at runtime through the bind mount.
+- This container is CPU-focused. If you need GPU acceleration later, the setup can be extended with NVIDIA Container Toolkit.
+
 ## Contributing
 
 This is a Bachelor's thesis project. For questions or collaboration:
+
 1. Review the notebooks in [`notebooks/`](notebooks/)
 2. Check utility functions in [`utils/`](utils/)
 3. Examine trained models in [`models/`](models/)
@@ -190,9 +233,10 @@ This is a Bachelor's thesis project. For questions or collaboration:
 ## License
 
 This project uses code adapted from SimCLR implementations:
+
 - Licensed under GNU General Public License v3.0
 - Based on Tang et al. SimCLR work (https://arxiv.org/abs/2011.11542)
 
 ---
 
-*Last Updated: December 2025*
+_Last Updated: December 2025_

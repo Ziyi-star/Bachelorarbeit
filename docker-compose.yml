@@ -1,0 +1,14 @@
+services:
+  bachelorarbeit:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: bachelorarbeit-notebook
+    ports:
+      - "8888:8888"
+    volumes:
+      - .:/workspace
+    working_dir: /workspace
+    environment:
+      - PYTHONPATH=/workspace
+      - TF_CPP_MIN_LOG_LEVEL=2
